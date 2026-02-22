@@ -8,6 +8,7 @@ struct Stack {
   size_t capacity;
 };
 
+// O(1)
 Stack *create(size_t inital_cap) {
   Stack *s = (Stack *)malloc(sizeof(Stack));
   if (!s)
@@ -28,6 +29,7 @@ Stack *create(size_t inital_cap) {
   return s;
 }
 
+// O(1)
 void destroy(Stack *s) {
   if (!s)
     return;
@@ -35,6 +37,7 @@ void destroy(Stack *s) {
   free(s);
 }
 
+// O(1), if i had done realloc here it would be O(n)
 StackResult push(Stack *s, int val) {
   if (!s)
     return STACK_ERR_NULL;
@@ -47,6 +50,7 @@ StackResult push(Stack *s, int val) {
   return STACK_OK;
 }
 
+// O(1)
 StackResult pop(Stack *s, int *out) {
   if (!s)
     return STACK_ERR_NULL;
@@ -58,6 +62,7 @@ StackResult pop(Stack *s, int *out) {
   return STACK_OK;
 }
 
+// O(1)
 StackResult top(const Stack *s, int *out) {
   if (!s || !out)
     return STACK_ERR_NULL;
@@ -68,10 +73,13 @@ StackResult top(const Stack *s, int *out) {
   return STACK_OK;
 }
 
+// O(1)
 size_t stack_size(Stack *s) { return s ? s->size : 0; }
 
+// O(1)
 bool stack_empty(const Stack *s) { return !s || s->size == 0; }
 
+// O(n)
 void print(const Stack *s) {
   if (!s)
     return;
