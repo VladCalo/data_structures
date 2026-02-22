@@ -2,8 +2,8 @@
 #define STACK_H
 
 #include <stdatomic.h>
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct Stack Stack;
 
@@ -20,6 +20,8 @@ void destroy(Stack *s);
 StackResult push(Stack *s, int val);
 StackResult pop(Stack *s, int *out);
 StackResult top(const Stack *s, int *out);
+
+void print(const Stack *s);
 
 size_t stack_size(Stack *s);
 bool stack_empty(const Stack *s);

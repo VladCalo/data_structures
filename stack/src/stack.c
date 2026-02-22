@@ -8,8 +8,7 @@ struct Stack {
   size_t capacity;
 };
 
-Stack *
-create(size_t inital_cap) {
+Stack *create(size_t inital_cap) {
   Stack *s = (Stack *)malloc(sizeof(Stack));
   if (!s)
     return NULL;
@@ -72,3 +71,13 @@ StackResult top(const Stack *s, int *out) {
 size_t stack_size(Stack *s) { return s ? s->size : 0; }
 
 bool stack_empty(const Stack *s) { return !s || s->size == 0; }
+
+void print(const Stack *s) {
+  if (!s)
+    return;
+  printf("Printing stack (top->bottom):\n");
+
+  for (size_t i = s->size; i > 0; i--) {
+    printf("%d\n", s->data[i - 1]);
+  }
+}
