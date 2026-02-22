@@ -2,7 +2,7 @@ CC      = clang
 CFLAGS  = -Iinclude -Wall -Wextra -Wpedantic -std=c11
 
 TARGET  = app
-SRCS    = src/stack.c main.c
+SRCS    = src/vector.c main.c
 
 .PHONY: all clean
 

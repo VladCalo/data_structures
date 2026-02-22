@@ -1,29 +1,20 @@
-#ifndef STACK_H
-#define STACK_H
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct Stack Stack;
+typedef struct Vector Vector;
 
-typedef enum {
-  STACK_OK = 0,
-  STACK_ERR_NULL,
-  STACK_ERR_EMPTY,
-  STACK_ERR_FULL,
-} StackResult;
+Vector *create(size_t inital_cap);
+void destroy(Vector *v);
 
-Stack *create(size_t inital_cap);
-void destroy(Stack *s);
-
-StackResult push(Stack *s, int val);
-StackResult pop(Stack *s, int *out);
-StackResult top(const Stack *s, int *out);
-
-void print(const Stack *s);
-
-size_t stack_size(Stack *s);
-bool stack_empty(const Stack *s);
+void push_back(Vector *v, int elem);
+int back(Vector *v);
+int pop_back(Vector *v);
+bool find_elem(Vector *v, int elem);
+void insert_at_index(Vector *v, size_t index, int elem);
+void remove_at_index(Vector *v, size_t index);
 
 #endif

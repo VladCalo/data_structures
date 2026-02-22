@@ -1,42 +1,28 @@
-#include "stack.h"
+#include "vector.h"
 #include <stdio.h>
 
-static const char *stack_result_str(StackResult r) {
-  switch (r) {
-  case STACK_OK:
-    return "OK";
-  case STACK_ERR_NULL:
-    return "NULL arg";
-  case STACK_ERR_EMPTY:
-    return "EMPTY";
-  case STACK_ERR_FULL:
-    return "FULL";
-  default:
-    return "UNKNOWN";
-  }
-}
-
 int main(void) {
-  Stack *s = create(2);
+  Vector *v = create(4);
 
-  StackResult rp = push(s, 10);
-  printf("Result of push: %s\n", stack_result_str(rp));
+  push_back(v, 10);
+  push_back(v, 20);
+  push_back(v, 30);
+  push_back(v, 40);
+  push_back(v, 50);
 
-  StackResult rp1 = push(s, 20);
-  printf("Result of push1: %s\n", stack_result_str(rp1));
+  printf("back: %d\n", back(v));
+  printf("pop_back: %d\n", pop_back(v));
+  printf("back after pop: %d\n", back(v));
 
-  print(s);
-  int top_elem;
-  StackResult r = top(s, &top_elem);
-  printf("Top: %d with result %s\n", top_elem, stack_result_str(r));
+  printf("find 20: %d\n", find_elem(v, 20));
+  printf("find 99: %d\n", find_elem(v, 99));
 
-  int elem;
-  StackResult rr = pop(s, &elem);
-  printf("Elem: %d with result: %s\n", elem, stack_result_str(rr));
+  insert_at_index(v, 1, 99);
+  printf("after insert_at_index(1, 99) -> find 99: %d\n", find_elem(v, 99));
 
-  print(s);
+  remove_at_index(v, 1);
+  printf("after remove_at_index(1)     -> find 99: %d\n", find_elem(v, 99));
 
-  destroy(s);
-
+  destroy(v);
   return 0;
 }
