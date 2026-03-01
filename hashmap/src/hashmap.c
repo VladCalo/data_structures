@@ -1,10 +1,13 @@
 #include "hashmap.h"
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define COLLISIONS 0;
+#define COLISIONS 1
+#define MODULO 3
 
 static uint64_t djb2_hash(const char *key) {
   uint64_t hash = 5381;
@@ -25,13 +28,13 @@ static uint64_t simple_hash(const char *key) {
     key++;
   }
 
-  hash = sum % 3;
+  hash = sum % MODULO;
   return hash;
 }
 
 static uint64_t hash_function(const char *key) {
   uint64_t hash = 0;
-  if (COLLISIONS) {
+  if (COLISIONS) {
     hash = simple_hash(key);
   } else {
     hash = djb2_hash(key);
@@ -50,11 +53,13 @@ bool init(HashMap *map, size_t capacity) {
 
   map->capacity = capacity;
   map->size = 0;
+
+  return true;
 }
 
 void destroy(HashMap *map) {
   if (!map || !map->buckets)
-    return false;
+    return;
 
   for (size_t i = 0; i < map->capacity; i++) {
     Entry *curr = map->buckets[i];
@@ -72,5 +77,107 @@ void destroy(HashMap *map) {
 }
 
 bool insert(HashMap *map, const char *key, int value) {
-  uint64_t hash = djb2_hash(key);
+  if (!map || !key || map->capacity == 0)
+    return false;
+
+  uint64_t hash = hash_function(key);
+  size_t index = hash % map->capacity;
+
+  Entry *curr = map->buckets[index];
+  while (curr) {
+    if (curr->hash == hash && strcmp(curr->key, key) == 0) {
+      curr->value = value;
+      return true;
+    }
+    curr = curr->next;
+  }
+
+  Entry *entry = (Entry *)malloc(sizeof(*entry));
+  if (!entry)
+    return false;
+
+  size_t klen = strlen(key);
+  entry->key = (char *)malloc(klen + 1);
+  if (!entry->key) {
+    free(entry);
+    return false;
+  }
+
+  memcpy(entry->key, key, klen + 1);
+
+  entry->value = value;
+  entry->hash = hash;
+
+  entry->next = map->buckets[index];
+  map->buckets[index] = entry;
+
+  map->size++;
+  return true;
+}
+
+bool lookup(HashMap *map, const char *key, int *out_value) {
+  if (!map || !key || map->capacity == 0)
+    return false;
+
+  uint64_t hash = hash_function(key);
+  size_t index = hash % map->capacity;
+
+  Entry *curr = map->buckets[index];
+  while (curr) {
+    if (curr->hash == hash && strcmp(curr->key, key) == 0) {
+      *out_value = curr->value;
+      return true;
+    }
+    curr = curr->next;
+  }
+
+  return false;
+}
+
+bool hm_remove(HashMap *map, const char *key) {
+  if (!map || !key || map->capacity == 0)
+    return false;
+
+  uint64_t hash = hash_function(key);
+  size_t index = hash % map->capacity;
+
+  Entry *curr = map->buckets[index];
+  Entry *prev = NULL;
+  while (curr) {
+    if (curr->hash == hash && strcmp(curr->key, key) == 0) {
+      if (prev)
+        prev->next = curr->next;
+      else
+        map->buckets[index] = curr->next;
+      free(curr->key);
+      free(curr);
+      map->size--;
+      return true;
+    }
+    prev = curr;
+    curr = curr->next;
+  }
+
+  return false;
+}
+
+// O(n)
+void print_map(const HashMap *map) {
+  if (!map)
+    return;
+
+  printf("HashMap [size=%zu, capacity=%zu]\n", map->size, map->capacity);
+  for (size_t i = 0; i < map->capacity; i++) {
+    printf("  bucket[%zu]: ", i);
+    Entry *curr = map->buckets[i];
+    if (!curr) {
+      printf("NULL");
+    }
+    while (curr) {
+      printf("\"%s\":%d", curr->key, curr->value);
+      curr = curr->next;
+      printf(curr ? " -> " : " -> NULL");
+    }
+    printf("\n");
+  }
 }

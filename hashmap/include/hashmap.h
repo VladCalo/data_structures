@@ -1,17 +1,16 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 
-#include <cstddef>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stddef.h>
+#include <stdint.h>
 
-typedef struct Entry Entry {
+typedef struct Entry {
   char *key;
   int value;
   uint64_t hash;
-  Entry *next;
-}
+  struct Entry *next;
+} Entry;
 
 typedef struct HashMap {
   Entry **buckets;
@@ -20,10 +19,12 @@ typedef struct HashMap {
 } HashMap;
 
 bool init(HashMap *map, size_t capacity);
-void destroy(Hashmap *map);
+void destroy(HashMap *map);
 
 bool insert(HashMap *map, const char *key, int value);
 bool lookup(HashMap *map, const char *key, int *out_value);
-bool remove(HashMap *map, const char *key);
+bool hm_remove(HashMap *map, const char *key);
 
-#endif HASHMAP_H
+void print_map(const HashMap *map);
+
+#endif
