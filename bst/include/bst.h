@@ -19,7 +19,7 @@ typedef struct BST {
 void init(BST *bst);
 void destroy(BST *bst);
 
-BST *find(BST *bst, int key);
+Node *find(BST *bst, int key);
 
 bool insert(BST *bst, int key);
 bool delete(BST *bst, int key);
