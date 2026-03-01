@@ -9,6 +9,7 @@
 #define COLISIONS 1
 #define MODULO 3
 
+// O(k) - k is key length
 static uint64_t djb2_hash(const char *key) {
   uint64_t hash = 5381;
   int c;
@@ -19,6 +20,7 @@ static uint64_t djb2_hash(const char *key) {
   return hash;
 }
 
+// O(k) - k is key length
 // so collision is caused 3+ elems
 static uint64_t simple_hash(const char *key) {
   uint64_t sum = 0;
@@ -32,6 +34,7 @@ static uint64_t simple_hash(const char *key) {
   return hash;
 }
 
+// O(k) - k is key length
 static uint64_t hash_function(const char *key) {
   uint64_t hash = 0;
   if (COLISIONS) {
@@ -43,6 +46,7 @@ static uint64_t hash_function(const char *key) {
   return hash;
 }
 
+// O(n) - n is capacity (calloc zeroes the bucket array)
 bool init(HashMap *map, size_t capacity) {
   if (!map || capacity == 0)
     return false;
@@ -57,6 +61,7 @@ bool init(HashMap *map, size_t capacity) {
   return true;
 }
 
+// O(n) - n is total number of entries
 void destroy(HashMap *map) {
   if (!map || !map->buckets)
     return;
@@ -76,6 +81,7 @@ void destroy(HashMap *map) {
   map->size = 0;
 }
 
+// O(1) average, O(n) worst case (all keys in one bucket)
 bool insert(HashMap *map, const char *key, int value) {
   if (!map || !key || map->capacity == 0)
     return false;
@@ -115,6 +121,7 @@ bool insert(HashMap *map, const char *key, int value) {
   return true;
 }
 
+// O(1) average, O(n) worst case (all keys in one bucket)
 bool lookup(HashMap *map, const char *key, int *out_value) {
   if (!map || !key || map->capacity == 0)
     return false;
@@ -134,6 +141,7 @@ bool lookup(HashMap *map, const char *key, int *out_value) {
   return false;
 }
 
+// O(1) average, O(n) worst case (all keys in one bucket)
 bool hm_remove(HashMap *map, const char *key) {
   if (!map || !key || map->capacity == 0)
     return false;
