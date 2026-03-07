@@ -2,9 +2,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+// O(1)
 static Node *createNode(int data) {
-  Node *node = malloc(sizof(Node));
+  Node *node = malloc(sizeof(Node));
 
   if (!node)
     return NULL;
@@ -16,11 +18,13 @@ static Node *createNode(int data) {
   return node;
 }
 
+// O(1)
 void init(BST *bst) {
   bst->root = NULL;
   bst->size = 0;
 }
 
+// O(n)
 static void free_subtree(Node *node) {
   if (!node)
     return;
@@ -29,6 +33,7 @@ static void free_subtree(Node *node) {
   free(node);
 }
 
+// O(n)
 void destroy(BST *bst) {
   if (!bst)
     return;
@@ -37,6 +42,7 @@ void destroy(BST *bst) {
   bst->size = 0;
 }
 
+// O(log n) average, O(n) worst case
 bool insert(BST *bst, int key) {
   if (!bst)
     return false;
@@ -52,7 +58,7 @@ bool insert(BST *bst, int key) {
     } else if (curr->data > key) {
       curr = curr->left;
     } else {
-      printf("Node already in BST\n");
+      printf("Node already in BST %d\n", key);
       return false;
     }
   }
@@ -68,11 +74,13 @@ bool insert(BST *bst, int key) {
   } else if (parent->data < key) {
     parent->right = newNode;
   } else {
-    parent->left = newNode
+    parent->left = newNode;
   }
   bst->size++;
+  return true;
 }
 
+// O(log n) average, O(n) worst case
 Node *find(BST *bst, int key) {
   if (!bst)
     return NULL;
@@ -91,4 +99,153 @@ Node *find(BST *bst, int key) {
     }
   }
   return NULL;
+}
+
+// O(log n) average, O(n) worst case
+Node *successor(Node *node) {
+  if (!node)
+    return NULL;
+
+  if (node->right) {
+    Node *succ = node->right;
+    while (succ->left) {
+      succ = succ->left;
+    }
+    return succ;
+  }
+
+  Node *parent = node->parent;
+  while (parent && node == parent->right) {
+    node = parent;
+    parent = parent->parent;
+  }
+
+  return parent;
+}
+
+// O(log n) average, O(n) worst case
+bool delete(BST *bst, int key) {
+  if (!bst)
+    return false;
+
+  Node *node = find(bst, key);
+  if (!node)
+    return false;
+
+  // leaf node
+  if (!node->right && !node->left) {
+    Node *parent = node->parent;
+
+    if (!parent)
+      bst->root = NULL;
+
+    else if (parent->left == node)
+      parent->left = NULL;
+
+    else if (parent->right == node)
+      parent->right = NULL;
+
+    free(node);
+    bst->size--;
+
+    return true;
+  }
+
+  // 1 child
+  if ((node->left && !node->right) || (!node->left && node->right)) {
+    Node *child;
+
+    if (node->left)
+      child = node->left;
+    else
+      child = node->right;
+
+    if (!node->parent) {
+      bst->root = child;
+      child->parent = NULL;
+    } else {
+      Node *parent = node->parent;
+      if (parent->left == node)
+        parent->left = child;
+      else
+        parent->right = child;
+
+      child->parent = parent;
+    }
+
+    free(node);
+    bst->size--;
+    return true;
+  }
+
+  // 2 children
+  if (node->left && node->right) {
+    Node *succ = successor(node);
+    node->data = succ->data;
+
+    Node *parent = succ->parent;
+    Node *child = succ->right;
+
+    if (child)
+      child->parent = parent;
+
+    if (parent->left == succ)
+      parent->left = child;
+    else
+      parent->right = child;
+
+    free(succ);
+    bst->size--;
+    return true;
+  }
+
+  return false;
+}
+
+// O(n)
+void print(BST *bst, const char *mode) {
+  if (!bst) {
+    printf("Not a valid BST!\n");
+    return;
+  }
+
+  Node *root = bst->root;
+
+  if (strcmp(mode, "inorder") == 0)
+    inorder(root);
+  else if (strcmp(mode, "postorder") == 0)
+    postorder(root);
+  else if (strcmp(mode, "preorder") == 0)
+    preorder(root);
+  else
+    printf("Not a valid mode!\n");
+
+  printf("\n");
+}
+
+// O(n)
+void inorder(Node *root) {
+  if (!root)
+    return;
+  inorder(root->left);
+  printf("%d, ", root->data);
+  inorder(root->right);
+}
+
+// O(n)
+void preorder(Node *root) {
+  if (!root)
+    return;
+  printf("%d, ", root->data);
+  preorder(root->left);
+  preorder(root->right);
+}
+
+// O(n)
+void postorder(Node *root) {
+  if (!root)
+    return;
+  postorder(root->left);
+  postorder(root->right);
+  printf("%d, ", root->data);
 }
